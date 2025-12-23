@@ -137,6 +137,6 @@ fn end() {
 }
 
 fn main() -> () {
-    till_final();
-    //end();
+    //till_final();
+    end();
 }

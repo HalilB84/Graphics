@@ -3,6 +3,7 @@ use crate::interval::*;
 use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
+use crate::material::Lambertian;
 
 //https://stackoverflow.com/questions/49834414/what-is-the-rust-equivalent-of-cs-shared-ptr
 #[derive(Clone)]
@@ -19,7 +20,7 @@ impl HitRecord {
         HitRecord {
             p: Point3::new(0., 0., 0.),
             normal: Vec3::new(0., 0., 0.),
-            mat: Rc::new(crate::material::Lambertian::new(Vec3::new(0., 0., 0.))),
+            mat: Rc::new(Lambertian::new(Vec3::new(0., 0., 0.))),
             t: 0.,
             front_face: false,
         }

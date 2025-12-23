@@ -148,6 +148,7 @@ impl Camera {
         } else {
             self.defocus_disk_sample()
         };
+
         let ray_direction = pixel_sample - ray_origin;
 
         Ray::new(ray_origin, ray_direction)

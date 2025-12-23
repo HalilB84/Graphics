@@ -4,9 +4,9 @@ Ray Tracing In One Weekend - Book 1 (rust)
 
 ![Render](rtiow-1/render.png)
 
-Ray Tracing In One Weekend - Book 2 (In progress - rust)
+Ray Tracing In One Weekend - Book 2 (rust - needs more documentation + creative render as photo)
 
-
+![Render](rtiow-2/render.jpg)
 
 Other planned ones:
 
