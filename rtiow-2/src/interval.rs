@@ -7,6 +7,7 @@ pub struct Interval {
     pub max: f64,
 }
 
+//pretty much self explanatory interval class, much more usefull than initially thought
 impl Interval {
     pub fn new(min: f64, max: f64) -> Interval {
         Interval { min: min, max: max }
@@ -43,9 +44,7 @@ impl Interval {
         x
     }
 
-    //the reason why we have this is because a rays direction could be 0 and also be perfectly aligned with boundary of the bbox
-    //this would result in a NaN and the small padding is to prevent that (?)
-    //Its not used for spheres so I dont get how this fixes stuff just yet?
+    //the reason why we have this for quads and triangles they might not have depth if they are perfectly aligned, which would result in double NaNs if the ray was alsp peflectly parallel to the quad and also at the exact same plane
     pub fn expand(&self, delta: f64) -> Interval {
         let padding = delta / 2.0;
         Interval {

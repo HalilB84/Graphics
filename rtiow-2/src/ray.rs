@@ -7,6 +7,7 @@ pub struct Ray {
     time: f64,
 }
 
+//just a quick wrapper on the vec3 class to extend it to a line from a point
 impl Ray {
     pub fn new(origin: Point3, direction: Vec3, time: f64) -> Ray {
         Ray {

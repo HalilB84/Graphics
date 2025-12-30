@@ -5,7 +5,6 @@ use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 use std::f64::INFINITY;
-use std::mem::offset_of;
 use std::rc::Rc;
 
 //interface (java) equivalent in rust
@@ -16,6 +15,9 @@ pub trait Hittable {
 }
 
 //https://stackoverflow.com/questions/49834414/what-is-the-rust-equivalent-of-cs-shared-ptr
+//this couldve been very well a &dyn Material but it would force lifetimes with bad looking syntax
+//the reason is that when you use a reference as a struct field rust wants us to gurantee that the owner of the actual value wont go out before this struct
+//https://doc.rust-lang.org/book/ch05-01-defining-structs.html -> "It’s also possible for structs to store references to data owned by something else, but to do so requires the use of lifetimes" I do not know lifetimes so here you go
 #[derive(Clone)]
 pub struct HitRecord {
     pub p: Point3,
@@ -98,6 +100,7 @@ pub struct RotateY {
     bbox: AABB,
 }
 
+//similarly to translate, for rotateY we rotate the Y, because you cant rotate a bounding box you construct a new one
 impl RotateY {
     pub fn new(object: Rc<dyn Hittable>, angle: f64) -> RotateY {
         let radians = angle.to_radians();

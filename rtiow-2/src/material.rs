@@ -1,24 +1,24 @@
 use std::rc::Rc;
 
-use crate::hittable::{HitRecord, Hittable};
+use crate::color::*;
+use crate::hittable::HitRecord;
 use crate::ray::Ray;
 use crate::texture::{SolidColor, Texture};
 use crate::utils::random_double;
 use crate::vec3::{Point3, Vec3};
-use crate::{color::*, texture};
 
 pub trait Material {
     fn scatter(
         &self,
-        r_in: &Ray,
-        rec: &HitRecord,
-        attenuation: &mut Color,
-        scattered: &mut Ray,
+        _r_in: &Ray,
+        _rec: &HitRecord,
+        _attenuation: &mut Color,
+        _scattered: &mut Ray,
     ) -> bool {
         false
     }
 
-    fn emitted(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn emitted(&self, _u: f64, _v: f64, _p: Point3) -> Color {
         Color::new(0., 0., 0.)
     }
 }
@@ -89,7 +89,7 @@ impl Material for Metal {
     ) -> bool {
         let alternate_normal =
             Vec3::unit_vector(rec.normal + self.fuzz * Vec3::random_unit_vector());
-        let mut reflected = Vec3::reflect(r_in.direction(), alternate_normal);
+        let reflected = Vec3::reflect(r_in.direction(), alternate_normal);
         //reflected = Vec3::unit_vector(reflected) + self.fuzz * Vec3::random_unit_vector();
 
         *scattered = Ray::new(rec.p, reflected, r_in.time());

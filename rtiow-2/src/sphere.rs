@@ -42,7 +42,7 @@ impl Sphere {
     }
 
     //point on a unit sphere to uv calculations
-    //see notes for how its derived
+    //see notes for derivation
     pub fn get_sphere_uv(p: &Point3, u: &mut f64, v: &mut f64) -> () {
         let theta = (-p.y()).acos();
         let phi = (-p.z()).atan2(p.x()) + PI;

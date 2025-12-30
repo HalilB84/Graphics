@@ -1,10 +1,5 @@
-use crate::{
-    color::{self, *},
-    perlin::Perlin,
-    vec3::Point3,
-};
-use image::{ImageReader, Pixel, RgbImage};
-use std::path::Path;
+use crate::{color::*, perlin::Perlin, vec3::Point3};
+use image::{ImageReader, RgbImage};
 use std::rc::Rc;
 
 //just returning a constant color
@@ -27,7 +22,7 @@ impl SolidColor {
 }
 
 impl Texture for SolidColor {
-    fn value(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn value(&self, _u: f64, _v: f64, _p: Point3) -> Color {
         self.albedo
     }
 }
@@ -91,7 +86,7 @@ impl ImageTexture {
 }
 
 impl Texture for ImageTexture {
-    fn value(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn value(&self, u: f64, v: f64, _p: Point3) -> Color {
         if self.image.width() == 0 {
             return Color::new(0.0, 1.0, 1.0);
         }
@@ -132,7 +127,7 @@ impl NoiseTexture {
 }
 
 impl Texture for NoiseTexture {
-    fn value(&self, u: f64, v: f64, p: Point3) -> Color {
+    fn value(&self, _u: f64, _v: f64, p: Point3) -> Color {
         //Color::new(1., 1., 1.) * self.noise.turb(p, 7)
         return Color::new(0.5, 0.5, 0.5)
             * (1. + (self.scale * p.z() + 10. * self.noise.turb(p, 7)).sin());

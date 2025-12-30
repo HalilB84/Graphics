@@ -7,7 +7,7 @@ use crate::{
     material::Material,
     vec3::{Point3, Vec3},
 };
-use crate::{hittable::*, interval::*, ray::*};
+use crate::{interval::*, ray::*};
 
 //See notes for the derivation
 pub struct Quad {
@@ -63,6 +63,9 @@ impl Hittable for Quad {
         let denom = Vec3::dot(self.normal, r.direction());
 
         if denom.abs() < 1e-8 {
+            //not gonna lie if we have this, then why is there a need for pad minumums? there is no way an intersection can be NaN with the quad bbox if its not pefectly aligned on an axis and this code handles the case that the ray is parallel to the quad
+            //if we didnt have pad minumums and the ray was parallel to the quad then bbox doesnt hit anyways, so the object wont get hit
+            //for future reference
             return false;
         }
 

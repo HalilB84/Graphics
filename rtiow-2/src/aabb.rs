@@ -5,6 +5,8 @@ use crate::{
 };
 use std::ops::Add;
 
+//AABB (Axis aligned bounding box) is a way to specify the box containing the object that is parallel to each axis
+//the idea is pretty simple, find the box that contains the object by testing min maxs / merge boxes to find bbox of miltiple objects
 #[derive(Copy, Clone, Debug)]
 pub struct AABB {
     pub x: Interval,
@@ -16,7 +18,7 @@ impl AABB {
     pub fn new(x: Interval, y: Interval, z: Interval) -> AABB {
         let mut bbox = AABB { x: x, y: y, z: z };
 
-        bbox.pad_to_minumums();
+        bbox.pad_to_minumums(); //the reason we pad to minumums is because
 
         bbox
     }
@@ -62,6 +64,13 @@ impl AABB {
         }
         &self.x
     }
+
+    //the hit function tests whether the ray intersects with the planes making the box
+    //note that unless the ray is parallel to these planes it is guranteed to intersect. The case where its parallel is fine because of how division by 0 works (yields -inf or +inf dpeending on if its inside/outside)
+    //at any case a NaN where t0 = 0/0 always results in false when compared, even after the padding area if the ray is magically parallel and on one of the planes it will be a miss
+    //there should be no case where both t0 and t1 are NaNs bc of pad minumum
+
+    //after getting all these t values we compare the interval each axis and if ray_tmax > ray_t.min everything is superb
 
     pub fn hit(&self, r: &Ray, mut ray_t: Interval) -> bool {
         let ray_orig = r.origin();

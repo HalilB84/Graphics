@@ -73,6 +73,7 @@ impl BvhNode {
         }
     }
 
+    //reminder that things are sorted by one corner of the box, meaning the bbox can overlap if an pbjects bbox leaks into to neighborhing bbox
     fn box_compare(a: &Rc<dyn Hittable>, b: &Rc<dyn Hittable>, axis_index: usize) -> Ordering {
         let bbox1 = a.bounding_box();
         let bbox2 = b.bounding_box();
@@ -101,8 +102,8 @@ impl BvhNode {
 }
 
 //when the hit function is called for the root node of the BVH tree in hittable_list
-//this function recurses all the way down to the leaf. But remember the leaf left and rights are Spheres not BvhNodes!
-//this means that Sphere.hit() is called instead of this function. This is why it works
+//this function recurses all the way down to the leaf. But remember the leaf left and rights are other Hittables not BvhNodes!
+//this means that other_hittable.hit() is called instead of this function. This is why it works
 impl Hittable for BvhNode {
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         if !self.bbox.hit(r, ray_t) {

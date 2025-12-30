@@ -7,6 +7,7 @@ use crate::vec3::Vec3;
 pub type Color = Vec3;
 
 //gamma/srgb shi because humans see colors nonlinearly and that stuff
+//note that I do not fully understand colorspaces it needs work
 pub fn linear_to_gamma(linear_component: f64) -> f64 {
     if linear_component > 0.0 {
         return linear_component.sqrt();
@@ -26,9 +27,9 @@ pub fn write_color(pixel_color: &Color, file: &mut File) -> std::io::Result<()> 
 
     let intensity: Interval = Interval::new(0.000, 0.999);
 
-    let rbyte: u32 = (256. * intensity.clamp(r)) as u32;
-    let gbyte: u32 = (256. * intensity.clamp(g)) as u32;
-    let bbyte: u32 = (256. * intensity.clamp(b)) as u32;
+    let rbyte = 256. * intensity.clamp(r);
+    let gbyte = 256. * intensity.clamp(g);
+    let bbyte = 256. * intensity.clamp(b);
 
     writeln!(file, "{} {} {}", rbyte, gbyte, bbyte)?;
 

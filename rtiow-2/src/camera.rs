@@ -95,7 +95,7 @@ impl Camera {
     }
 
     fn initialize(&mut self) -> () {
-        //approx ratio, its is not exactly the aspect ratio because integers round down
+        //we do give an aspect ratio, but that aspect ratio is not guranteed to result in a valid image pixel wise. This calculation below is a little different than our aspect
         self.image_height = (self.image_width as f64 / self.aspect_ratio) as i64;
         self.image_height = self.image_height.max(1);
 
@@ -114,6 +114,8 @@ impl Camera {
         //w is the direction unit vector looking at lookAt from lookfrom
         //u is the right unit vector perpendicular to the plane formed by vup and w -> note that vup is a dummy vector just to calculate u and breaks if vup and w are parallel
         //v is the up vector perpendicular to w and u -> this is the actual up direction of the camera
+
+        //note that this orientation of w relative to the vup vector chooes where the top left of the viewport ends in world space. When I say left in the cornell box it is also relative to the camera, if the camera was looking from +z it would be to the right
         let w = Vec3::unit_vector(self.lookfrom - self.lookat);
         let u = Vec3::unit_vector(Vec3::cross(self.vup, w));
         let v = Vec3::cross(w, u);
@@ -126,7 +128,7 @@ impl Camera {
         self.pixel_delta_u = viewport_u / self.image_width as f64;
         self.pixel_delta_v = viewport_v / self.image_height as f64;
 
-        //the point location of the top left corner of the viewport
+        //the point location of the top left corner of the viewport, remember that w is a unit vector just for direction!
         let viewport_upper_left =
             self.center - (self.focus_dist * w) - viewport_u / 2. - viewport_v / 2.;
 

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 mod aabb;
 mod bvh;
 mod camera;
@@ -12,24 +14,25 @@ mod quad;
 mod ray;
 mod sphere;
 mod texture;
+mod triangle;
 mod utils;
 mod vec3;
 
 use bvh::BvhNode;
 use camera::Camera;
 use color::Color;
+use hittable::{RotateY, Translate};
 use hittable_list::HittableList;
+use material::DiffuseLight;
 use material::{Dialectric, Material};
 use material::{Lambertian, Metal};
 use quad::*;
 use sphere::Sphere;
 use std::rc::Rc;
 use texture::{CheckerTexture, ImageTexture, NoiseTexture};
+use triangle::*;
 use utils::{random_double, random_double_range};
 use vec3::{Point3, Vec3};
-
-use crate::hittable::{RotateY, Translate};
-use crate::material::DiffuseLight;
 
 fn till_final() {
     let mut world: HittableList = HittableList::new();
@@ -245,11 +248,10 @@ fn perlin_spheres() {
 fn quads() {
     let mut world: HittableList = HittableList::new();
 
-    let left_red: Rc<Lambertian> = Rc::new(Lambertian::new(Color::new(1.0, 0.2, 0.2)));
-    let back_green: Rc<Lambertian> = Rc::new(Lambertian::new(Color::new(0.2, 1.0, 0.2)));
-    let right_blue: Rc<Lambertian> = Rc::new(Lambertian::new(Color::new(0.2, 0.2, 1.0)));
-    let upper_orange: Rc<Lambertian> = Rc::new(Lambertian::new(Color::new(1.0, 0.5, 0.0)));
-    let lower_teal: Rc<Lambertian> = Rc::new(Lambertian::new(Color::new(0.2, 0.8, 0.8)));
+    let left_red = Rc::new(Lambertian::new(Color::new(1.0, 0.2, 0.2)));
+    let right_blue = Rc::new(Lambertian::new(Color::new(0.2, 0.2, 1.0)));
+    let upper_orange = Rc::new(Lambertian::new(Color::new(1.0, 0.5, 0.0)));
+    let lower_teal = Rc::new(Lambertian::new(Color::new(0.2, 0.8, 0.8)));
 
     let earth_texture = Rc::new(ImageTexture::new("earthmap.jpg"));
     let earth_surface = Rc::new(Lambertian::new_tex(earth_texture));
@@ -344,9 +346,9 @@ fn simple_light() {
 fn cornell_box() {
     let mut world: HittableList = HittableList::new();
 
-    let red: Rc<Lambertian> = Rc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
-    let white: Rc<Lambertian> = Rc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
-    let green: Rc<Lambertian> = Rc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
+    let red = Rc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
+    let white = Rc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
+    let green = Rc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
     let light = Rc::new(DiffuseLight::new(Color::new(15., 15., 15.)));
 
     world.add(Rc::new(Quad::new(
@@ -589,11 +591,13 @@ fn final_scene() {
         0.2,
         Color::new(0.2, 0.4, 0.9),
     )));
+
     let boundary2 = Rc::new(Sphere::new(
         Point3::new(0., 0., 0.),
         5000.0,
         Rc::new(Dialectric::new(1.5, 0.0)),
     ));
+
     world.add(Rc::new(constant_medium::ConstantMedium::new(
         boundary2,
         0.0001,
@@ -603,11 +607,13 @@ fn final_scene() {
     let emat = Rc::new(Lambertian::new_tex(Rc::new(ImageTexture::new(
         "earthmap.jpg",
     ))));
+
     world.add(Rc::new(Sphere::new(
         Point3::new(400.0, 200.0, 400.0),
         100.0,
         emat,
     )));
+
     let pertext = Rc::new(NoiseTexture::new(0.2));
     world.add(Rc::new(Sphere::new(
         Point3::new(220.0, 280.0, 300.0),
@@ -618,7 +624,7 @@ fn final_scene() {
     let mut boxes2: HittableList = HittableList::new();
     let white = Rc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
     let ns = 1000;
-    for j in 0..ns {
+    for _j in 0..ns {
         boxes2.add(Rc::new(Sphere::new(
             Vec3::random_range(0., 165.),
             10.0,
@@ -631,7 +637,7 @@ fn final_scene() {
         Vec3::new(-100.0, 270.0, 395.0),
     )));
 
-    let mut cam = Camera::new(1.0, 600, 2000, 40, 40.0, 0.0, 10.0);
+    let mut cam = Camera::new(1.0, 800, 5000, 40, 40.0, 0.0, 10.0);
 
     cam.lookfrom = Point3::new(478.0, 278.0, -600.0);
     cam.lookat = Point3::new(278.0, 278.0, 0.0);
@@ -640,6 +646,123 @@ fn final_scene() {
 
     cam.defocus_angle = 0.0;
 
+    cam.render(&world).unwrap();
+}
+
+fn cornell_car() {
+    let mut world: HittableList = HittableList::new();
+
+    let red = Rc::new(Lambertian::new(Color::new(0.65, 0.05, 0.05)));
+    let white = Rc::new(Lambertian::new(Color::new(0.73, 0.73, 0.73)));
+    let green = Rc::new(Lambertian::new(Color::new(0.12, 0.45, 0.15)));
+    let light = Rc::new(DiffuseLight::new(Color::new(15., 15., 15.)));
+    let mirror = Rc::new(Metal::new(Vec3::new(0.4, 0.4, 0.4), 0.01));
+
+    let box_width = 1050.0;
+    let box_height = 600.0;
+    let box_depth = 800.0;
+    let center_x = box_width / 2.0;
+    let center_y = box_height / 2.0;
+
+    //left
+    world.add(Rc::new(Quad::new(
+        Vec3::new(box_width, 0.0, 0.0),
+        Vec3::new(0.0, box_height, 0.0),
+        Vec3::new(0.0, 0.0, box_depth),
+        green.clone(),
+    )));
+
+    //right
+    world.add(Rc::new(Quad::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(0.0, box_height, 0.0),
+        Vec3::new(0.0, 0.0, box_depth),
+        red.clone(),
+    )));
+
+    //lgiht
+    world.add(Rc::new(Quad::new(
+        Vec3::new(center_x + 260.0, box_height - 1.0, center_y + 105.0),
+        Vec3::new(-520.0, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -210.0),
+        light.clone(),
+    )));
+
+    //bottom
+    world.add(Rc::new(Quad::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(box_width, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, box_depth),
+        mirror.clone(),
+    )));
+
+    //top
+    world.add(Rc::new(Quad::new(
+        Vec3::new(box_width, box_height, box_depth),
+        Vec3::new(-box_width, 0.0, 0.0),
+        Vec3::new(0.0, 0.0, -box_depth),
+        white.clone(),
+    )));
+
+    //back
+    world.add(Rc::new(Quad::new(
+        Vec3::new(0.0, 0.0, box_depth),
+        Vec3::new(box_width, 0.0, 0.0),
+        Vec3::new(0.0, box_height, 0.0),
+        white.clone(),
+    )));
+
+    let mut triangles = HittableList::new();
+
+    let (models, _materials) = tobj::load_obj(
+        "porsche_911_with_interior.obj",
+        &tobj::OFFLINE_RENDERING_LOAD_OPTIONS,
+    )
+    .expect("Failed to load OBJ");
+
+    let car_material = Rc::new(Metal::new(Vec3::new(0.1, 0.1, 0.1), 0.0));
+    let scale = 200.0;
+    let offset = Vec3::new(590.0, 28.0, 640.0); //completely madeup by just looking
+
+    for (_i, m) in models.iter().enumerate() {
+        let mesh = &m.mesh;
+        for idx in mesh.indices.chunks(3) {
+            let v0 = idx[0] as usize;
+            let v1 = idx[1] as usize;
+            let v2 = idx[2] as usize;
+
+            let a = Point3::new(
+                mesh.positions[3 * v0] as f64 * scale + offset[0],
+                mesh.positions[3 * v0 + 1] as f64 * scale + offset[1],
+                mesh.positions[3 * v0 + 2] as f64 * scale + offset[2],
+            );
+
+            let b = Point3::new(
+                mesh.positions[3 * v1] as f64 * scale + offset[0],
+                mesh.positions[3 * v1 + 1] as f64 * scale + offset[1],
+                mesh.positions[3 * v1 + 2] as f64 * scale + offset[2],
+            );
+
+            let c = Point3::new(
+                mesh.positions[3 * v2] as f64 * scale + offset[0],
+                mesh.positions[3 * v2 + 1] as f64 * scale + offset[1],
+                mesh.positions[3 * v2 + 2] as f64 * scale + offset[2],
+            );
+            triangles.add(Rc::new(RotateY::new(
+                Rc::new(Triangle::new(a, b, c, car_material.clone())),
+                40.0,
+            )));
+        }
+    }
+
+    world.add(Rc::new(BvhNode::new(triangles)));
+
+    let mut cam = Camera::new(16.0 / 9.0, 700, 20, 10, 40.0, 0.0, 10.0);
+    cam.lookfrom = Point3::new(center_x, center_y, -800.0);
+    cam.lookat = Point3::new(center_x, center_y, 0.0);
+    cam.vup = Vec3::new(0.0, 1.0, 0.0);
+    cam.background = Color::new(0.7, 0.8, 1.);
+    cam.defocus_angle = 0.0;
     cam.render(&world).unwrap();
 }
 
@@ -653,5 +776,6 @@ fn main() -> () {
     //simple_light();
     //cornell_box();
     //cornell_smoke();
-    final_scene();
+    //final_scene();
+    cornell_car();
 }
