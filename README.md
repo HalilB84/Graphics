@@ -25,11 +25,14 @@ Credit: Porsche 911 with interior by [n.brizitskaya](https://sketchfab.com/3d-mo
 
 ---
 
-Other planned ones:
+TODO:
+~~Book 1 (rust)~~
+~~Book 2 (rust)~~
+learnopengl -> also learncpp at the same time with notes and the rustbook
+book 3 (rust) -> missing mathematical foundation, not sure what to do
+gpu tracing (full screen quad fragment shader, requires learning wgpu/webGPU?, wgsl) 
+vulkan (rust) -> I assume at this point I can latch onto something more
 
-learnopengl (which includes learning proper c++) -> book 3 (rust) -> gpu tracing (full screen quad fragment shader, requires learning wgpu/webGPU?, wgsl) -> vulkan (rust) -> I assume at this point I can latch onto something more
+Notes for the entirety of scratchapixel for how things work
+Somehow learn/relearn calc 1, 2, 3, linear algebra, Probability and stats, all sorts of math for graphics + machine/deep learning
 
-
-Notes:
-
-Planned for the entirety of scratchapixel
