@@ -2,11 +2,17 @@ use crate::color::*;
 use crate::hittable::HitRecord;
 use crate::hittable::Hittable;
 use crate::interval::Interval;
+use crate::material::ScatterRecord;
+use crate::pdf::CosinePDF;
+use crate::pdf::HittablePDF;
+use crate::pdf::MixturePDF;
+use crate::pdf::PDF;
 use crate::ray::Ray;
 use crate::utils::random_double;
 use crate::vec3::{Point3, Vec3};
 use std::fs::File;
 use std::io::Write;
+use std::rc::Rc;
 
 pub struct Camera {
     pub aspect_ratio: f64,
@@ -63,7 +69,11 @@ impl Camera {
         }
     }
 
-    pub fn render(&mut self, world: &dyn Hittable) -> std::io::Result<()> {
+    pub fn render(
+        &mut self,
+        world: &dyn Hittable,
+        lights: Rc<dyn Hittable>,
+    ) -> std::io::Result<()> {
         self.initialize();
 
         let mut file = File::create("image.ppm")?;
@@ -85,7 +95,8 @@ impl Camera {
 
                 for _sample in 0..self.samples_per_pixel {
                     let r: Ray = self.get_ray(i, j);
-                    pixel_color = pixel_color + self.ray_color(&r, self.max_depth, world);
+                    pixel_color =
+                        pixel_color + self.ray_color(&r, self.max_depth, world, lights.clone());
                 }
 
                 write_color(&(pixel_color * self.pixel_samples_scale), &mut file).unwrap();
@@ -112,9 +123,7 @@ impl Camera {
 
         //ok so what we have here is the vectors that show the camera orientation
         //w is the direction unit vector looking at lookfrom from lookat
-        //u is the right unit vector perpendicular to the plane formed by vup and w -> note that vup is a dummy vector just to calculate u and breaks if vup and w are parallel
-        //v is the up vector perpendicular to w and u -> this is the actual up direction of the camera
-
+        //u is the right unit vector perpendicular to the plane formed by vup and w -> note that vup is a dummy vector just to calculate u and breaks if vup and w are parallel v is the up vector perpendicular to w and u -> this is the actual up direction of the camera
         //note that this orientation of w relative to the vup vector chooes where the top left of the viewport ends in world space. When I say left in the cornell box it is also relative to the camera, if the camera was looking from +z it would be to the right
         let w = Vec3::unit_vector(self.lookfrom - self.lookat);
         let u = Vec3::unit_vector(Vec3::cross(self.vup, w));
@@ -169,7 +178,13 @@ impl Camera {
         self.center + (p.x() * self.defocus_disk_u) + (p.y() * self.defocus_disk_v)
     }
 
-    fn ray_color(&self, r: &Ray, depth: i64, world: &dyn Hittable) -> Color {
+    fn ray_color(
+        &self,
+        r: &Ray,
+        depth: i64,
+        world: &dyn Hittable,
+        lights: Rc<dyn Hittable>,
+    ) -> Color {
         if depth <= 0 {
             return Color::new(0., 0., 0.);
         }
@@ -182,26 +197,39 @@ impl Camera {
             return self.background;
         }
 
-        let mut scattered = Ray::new(Point3::new(0., 0., 0.), Vec3::new(0., 0., 0.), 0.);
-        //attenuation is how much the light is kept after a hit
-        let mut attenuation = Color::new(0., 0., 0.);
-        let color_from_emission = rec.mat.emitted(rec.u, rec.v, rec.p);
+        let mut srec = ScatterRecord::new();
+        let color_from_emission = rec.mat.emitted(&rec, rec.u, rec.v, rec.p);
 
-        //light sources do not emit, in this case the scatter func will call false and only return color from emission
-        if !rec.mat.scatter(r, &rec, &mut attenuation, &mut scattered) {
+        //if scatter returns false it means that the material doesnt scatter the ray for some
+        //reason. In this case we only case about the emission if there is any.
+        if !rec.mat.scatter(r, &rec, &mut srec) {
             return color_from_emission;
         }
 
-        let color_from_scatter = attenuation * self.ray_color(&scattered, depth - 1, world);
+        if srec.skip_pdf {
+            return srec.attenuation
+                * self.ray_color(&srec.skip_ray, depth - 1, world, lights.clone());
+        }
+
+        //(I think) what the book fails to mention is that we haven't come up with
+        //a better single PDF that recuces noise, the actual improvement happens in MIS
+        //only lights PDF is broken becaues it voilates the rules of monte carlo (f(x) > 0 -> p(x) > 0)
+        let light_ptr = Rc::new(HittablePDF::new(lights.clone(), rec.p));
+        //        let mixed_pdf = MixturePDF::new(light_ptr, srec.pdf);
+
+        let scattered = Ray::new(rec.p, light_ptr.generate(), r.time());
+        let pdf = light_ptr.value(scattered.direction());
+
+        //as long as the pdf and the scatter generation match, it will converge to the same result with varying speeds.
+        //When scatter pdf changes you are changing how the material reacts. (I think)
+        let scatter_pdf = rec.mat.scatter_pdf(&r, &rec, &scattered);
+        //pdf = scatter_pdf; //we implicitly had this this in book 1&2
+
+        let color_from_scatter = srec.attenuation
+            * scatter_pdf
+            * self.ray_color(&scattered, depth - 1, world, lights.clone())
+            / pdf;
 
         color_from_emission + color_from_scatter
-        /*unit vector because direction lengths are not the same
-        //why normalizing this every ray that doesnt hit anything returns a consistent color.
-        //no hit? we return the background color
-        let unit_direction: Vec3 = Vec3::unit_vector(r.direction());
-        //color cant be negative thus the reason for 0*5 () + 1
-        let a = 0.5 * (unit_direction.y() + 1.);
-        //linear interpolation
-        (1. - a) * Color::new(1., 1., 1.) + a * Color::new(0.5, 0.7, 1.)*/
     }
 }

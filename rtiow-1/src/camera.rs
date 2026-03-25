@@ -109,7 +109,7 @@ impl Camera {
         let viewport_width = viewport_height * (self.image_width as f64 / self.image_height as f64);
 
         //ok so what we have here is the vectors that show the camera orientation
-        //w is the direction unit vector looking at lookAt from lookfrom
+        //w is the direction unit vector looking at lookfrom from lookat
         //u is the right unit vector perpendicular to the plane formed by vup and w -> note that vup is a dummy vector just to calculate u and breaks if vup and w are parallel
         //v is the up vector perpendicular to w and u -> this is the actual up direction of the camera
         let w = Vec3::unit_vector(&(self.lookfrom - self.lookat));
