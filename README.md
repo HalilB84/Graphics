@@ -29,19 +29,20 @@ Ray Tracing The Next Week - Book 3 (rust)
 
 <details>
   <summary>Book3</summary>
+
 List of issues in the book that are unresolved, without these some parts make no sense. I suggest looking over them:
-https://github.com/RayTracing/raytracing.github.io/issues/1302
-https://github.com/RayTracing/raytracing.github.io/issues/1553
-https://github.com/RayTracing/raytracing.github.io/issues/1268
-https://github.com/RayTracing/raytracing.github.io/issues/1703
-https://github.com/RayTracing/raytracing.github.io/issues/1639
-https://github.com/RayTracing/raytracing.github.io/issues/1642
-https://github.com/RayTracing/raytracing.github.io/discussions/1735
+- https://github.com/RayTracing/raytracing.github.io/issues/1302
+- https://github.com/RayTracing/raytracing.github.io/issues/1553
+- https://github.com/RayTracing/raytracing.github.io/issues/1268
+- https://github.com/RayTracing/raytracing.github.io/issues/1703
+- https://github.com/RayTracing/raytracing.github.io/issues/1639
+- https://github.com/RayTracing/raytracing.github.io/issues/1642
+- https://github.com/RayTracing/raytracing.github.io/discussions/1735
 
 Also this topic is very interesting, see these readings for more info than the book provides:
-https://lisyarus.github.io/blog/posts/multiple-importance-sampling.html
-https://pbr-book.org/4ed/Monte_Carlo_Integration/Monte_Carlo_Basics (2.1 - 2.1.3)
-https://pbr-book.org/4ed/Monte_Carlo_Integration/Improving_Efficiency#StratifiedSampling (2.2 - 2.2.3)
+- https://lisyarus.github.io/blog/posts/multiple-importance-sampling.html
+- https://pbr-book.org/4ed/Monte_Carlo_Integration/Monte_Carlo_Basics (2.1 - 2.1.3)
+- https://pbr-book.org/4ed/Monte_Carlo_Integration/Improving_Efficiency#StratifiedSampling (2.2 - 2.2.3)
 
 </details>
 
