@@ -7,17 +7,17 @@ Ray Tracing In One Weekend - All books
 
 Book 1
 
-![Render](rtiow-1/render.png)
+![Render](rtiow1-3/render.png)
 
 ---
 
 Book 2
 
-![Render](rtiow-2/render.png)
+![Render](rtiow1-3/render(1).png)
 
 Credit: Porsche 911 with interior by [n.brizitskaya](https://sketchfab.com/3d-models/porsche-911-with-interior-877b1bc1739f4a2bb65d62fd7ffd9f75) licensed under CC BY 4.0
 
-![Render](rtiow-2/render2.png)
+![Render](rtiow1-3/render2.png)
 
 ---
 
