@@ -12,11 +12,19 @@ pub trait Hittable {
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool;
 
     fn bounding_box(&self) -> AABB;
+
+    fn pdf_value(&self, _origin: Point3, _dir: Vec3) -> f64 {
+        0.0
+    }
+
+    fn random(&self, _origin: Vec3) -> Vec3 {
+        Vec3::new(1.0, 0.0, 0.0)
+    }
 }
 
 //https://stackoverflow.com/questions/49834414/what-is-the-rust-equivalent-of-cs-shared-ptr
 //this couldve been very well a &dyn Material but it would force lifetimes with bad looking syntax
-//the reason is that when you use a reference as a struct field rust wants us to gurantee that the owner of the actual value wont go out before this struct
+//the reason is that when you use a reference as a struct field rust wants us to guarantee that the owner of the actual value wont go out before this struct
 //https://doc.rust-lang.org/book/ch05-01-defining-structs.html -> "It’s also possible for structs to store references to data owned by something else, but to do so requires the use of lifetimes" I do not know lifetimes so here you go
 #[derive(Clone)]
 pub struct HitRecord {

@@ -46,7 +46,7 @@ pub trait Material {
 //its not explained why this is a better model of reality so research
 //this is a diffuse material that scatters light proportional to cos(phi)
 pub struct Lambertian {
-    //albedo is how much color is reflected (of ecah color channel)
+    //albedo is how much color is reflected (of each color channel)
     tex: Rc<dyn Texture>,
 }
 
@@ -117,22 +117,22 @@ impl Material for Metal {
     }
 }
 
-pub struct Dialectric {
+pub struct Dielectric {
     refraction_index: f64,
     fuzz: f64,
 }
 
 //things like water, glass all that shabang that light bends when it enters the material
 //https://github.com/RayTracing/raytracing.github.io/issues/1717
-impl Dialectric {
-    pub fn new(refraction_index: f64, fuzz: f64) -> Dialectric {
-        Dialectric {
+impl Dielectric {
+    pub fn new(refraction_index: f64, fuzz: f64) -> Dielectric {
+        Dielectric {
             refraction_index: refraction_index,
             fuzz: fuzz,
         }
     }
 
-    //schlick's approximation that is not explained in the book -> reseRch
+    //schlick's approximation that is not explained in the book -> research
     fn reflectance(&self, cosine: f64, refraction_index: f64) -> f64 {
         let r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
         let r0 = r0 * r0;
@@ -141,7 +141,7 @@ impl Dialectric {
 }
 
 //see refract in vec3.rs for more explanation but the high level idea is that the light bends according to its refraction index
-impl Material for Dialectric {
+impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
         srec.attenuation = Color::new(1.0, 1.0, 1.0);
         srec.skip_pdf = true;
@@ -204,24 +204,24 @@ impl Material for DiffuseLight {
     }
 }
 
-pub struct Isotorpic {
+pub struct Isotropic {
     tex: Rc<dyn Texture>,
 }
 
-impl Isotorpic {
-    pub fn new(albedo: Color) -> Isotorpic {
-        Isotorpic {
+impl Isotropic {
+    pub fn new(albedo: Color) -> Isotropic {
+        Isotropic {
             tex: Rc::new(SolidColor::new(albedo)),
         }
     }
 
-    pub fn new_tex(tex: Rc<dyn Texture>) -> Isotorpic {
-        Isotorpic { tex: tex }
+    pub fn new_tex(tex: Rc<dyn Texture>) -> Isotropic {
+        Isotropic { tex: tex }
     }
 }
 
 //quite literally scatter in a random direction
-impl Material for Isotorpic {
+impl Material for Isotropic {
     fn scatter(&self, _r_in: &Ray, rec: &HitRecord, srec: &mut ScatterRecord) -> bool {
         srec.attenuation = self.tex.value(rec.u, rec.v, rec.p);
         srec.pdf = Rc::new(SpherePDF::new());

@@ -69,9 +69,9 @@ impl Sphere {
 
 impl Hittable for Sphere {
     //ray-sphere intersection
-    //Its understandable, at the end its just all math however I am curios on how people came up with these
-    //also whenever there is a hit registered HitRecord is given all the necessary infofmartion
-    //the HitRecord flow goes like: sphere -> hittalie_list -> camera -> material
+    //Its understandable, at the end its just all math however I am curious on how people came up with these
+    //also whenever there is a hit registered HitRecord is given all the necessary information
+    //the HitRecord flow goes like: sphere -> hittable_list -> camera -> material
     fn hit(&self, r: &Ray, ray_t: Interval, rec: &mut HitRecord) -> bool {
         let current_center = self.center.at(r.time());
         let oc: Vec3 = current_center - r.origin();

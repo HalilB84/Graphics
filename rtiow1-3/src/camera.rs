@@ -106,7 +106,7 @@ impl Camera {
     }
 
     fn initialize(&mut self) -> () {
-        //we do give an aspect ratio, but that aspect ratio is not guranteed to result in a valid image pixel wise. This calculation below is a little different than our aspect
+        //we do give an aspect ratio, but that aspect ratio is not guaranteed to result in a valid image pixel wise. This calculation below is a little different than our aspect
         self.image_height = (self.image_width as f64 / self.aspect_ratio) as i64;
         self.image_height = self.image_height.max(1);
 
@@ -212,10 +212,10 @@ impl Camera {
         }
 
         //(I think) what the book fails to mention is that we haven't come up with
-        //a better single PDF that recuces noise, the actual improvement happens in MIS
-        //only lights PDF is broken becaues it voilates the rules of monte carlo (f(x) > 0 -> p(x) > 0)
+        //a better single PDF that reduces noise, the actual improvement happens in MIS
+        //only lights PDF is broken becaues it violates the rules of monte carlo (f(x) > 0 -> p(x) > 0)
         let light_ptr = Rc::new(HittablePDF::new(lights.clone(), rec.p));
-        //        let mixed_pdf = MixturePDF::new(light_ptr, srec.pdf);
+        //let mixed_pdf = MixturePDF::new(light_ptr, srec.pdf);
 
         let scattered = Ray::new(rec.p, light_ptr.generate(), r.time());
         let pdf = light_ptr.value(scattered.direction());
@@ -224,6 +224,11 @@ impl Camera {
         //When scatter pdf changes you are changing how the material reacts. (I think)
         let scatter_pdf = rec.mat.scatter_pdf(&r, &rec, &scattered);
         //pdf = scatter_pdf; //we implicitly had this this in book 1&2
+        //think about it the pdf in lambertian and isotropic mats from the previous books was the same as the not shown scatter_pdf (they canceled out)
+
+        //also important, this confused me: from https://en.wikipedia.org/wiki/Lambertian_reflectance
+        //"When viewed from various angles, the reflected radiant intensity and the apparent area of the surface both vary with the cosine of the
+        //viewing angle, so the reflected radiance (intensity per unit area) is the same from all viewing angles."
 
         let color_from_scatter = srec.attenuation
             * scatter_pdf

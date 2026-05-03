@@ -26,7 +26,7 @@ use color::Color;
 use hittable::{RotateY, Translate};
 use hittable_list::HittableList;
 use material::DiffuseLight;
-use material::{Dialectric, Material};
+use material::{Dielectric, Material};
 use material::{Lambertian, Metal};
 use quad::*;
 use sphere::Sphere;
@@ -42,8 +42,8 @@ fn till_final() {
     let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
     let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
 
-    let material_left = Rc::new(Dialectric::new(1.5, 1.0));
-    let material_bubble = Rc::new(Dialectric::new(1.0 / 1.5, 1.0));
+    let material_left = Rc::new(Dielectric::new(1.5, 1.0));
+    let material_bubble = Rc::new(Dielectric::new(1.0 / 1.5, 1.0));
 
     let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
 
@@ -129,14 +129,14 @@ fn bouncing_spheres() {
                     sphere_material = Rc::new(Metal::new(albedo, fuzz));
                     world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
                 } else {
-                    sphere_material = Rc::new(Dialectric::new(1.5, 0.1));
+                    sphere_material = Rc::new(Dielectric::new(1.5, 0.1));
                     world.add(Rc::new(Sphere::new(center, 0.2, sphere_material)));
                 }
             }
         }
     }
 
-    let material1 = Rc::new(Dialectric::new(1.5, 0.0));
+    let material1 = Rc::new(Dielectric::new(1.5, 0.0));
     world.add(Rc::new(Sphere::new(
         Point3::new(0.0, 1.0, 0.0),
         1.0,
@@ -417,7 +417,7 @@ fn cornell_box() {
     box2 = Rc::new(Translate::new(box2, Vec3::new(130., 0., 65.)));
     //world.add(box2);
 
-    let glass = Rc::new(Dialectric::new(1.5, 0.0));
+    let glass = Rc::new(Dielectric::new(1.5, 0.0));
     let sphere = Rc::new(Sphere::new(Point3::new(190.0, 90.0, 190.0), 90.0, glass));
     world.add(sphere);
 
@@ -598,7 +598,7 @@ fn final_scene() {
     world.add(Rc::new(Sphere::new(
         Point3::new(260.0, 150.0, 45.0),
         50.0,
-        Rc::new(Dialectric::new(1.5, 0.0)),
+        Rc::new(Dielectric::new(1.5, 0.0)),
     )));
 
     world.add(Rc::new(Sphere::new(
@@ -610,7 +610,7 @@ fn final_scene() {
     let boundary = Rc::new(Sphere::new(
         Point3::new(360.0, 150.0, 145.0),
         70.0,
-        Rc::new(Dialectric::new(1.5, 0.0)),
+        Rc::new(Dielectric::new(1.5, 0.0)),
     ));
 
     world.add(boundary.clone());
@@ -624,7 +624,7 @@ fn final_scene() {
     let boundary2 = Rc::new(Sphere::new(
         Point3::new(0., 0., 0.),
         5000.0,
-        Rc::new(Dialectric::new(1.5, 0.0)),
+        Rc::new(Dielectric::new(1.5, 0.0)),
     ));
 
     world.add(Rc::new(constant_medium::ConstantMedium::new(

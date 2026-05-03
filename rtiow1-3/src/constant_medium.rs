@@ -25,7 +25,7 @@ impl ConstantMedium {
         ConstantMedium {
             boundary: boundary,
             neg_inv_density: -1. / density,
-            phase_function: Rc::new(Isotorpic::new_tex(tex)),
+            phase_function: Rc::new(Isotropic::new_tex(tex)),
         }
     }
 
@@ -33,7 +33,7 @@ impl ConstantMedium {
         ConstantMedium {
             boundary: boundary,
             neg_inv_density: -1. / density,
-            phase_function: Rc::new(Isotorpic::new(albedo)),
+            phase_function: Rc::new(Isotropic::new(albedo)),
         }
     }
 }
